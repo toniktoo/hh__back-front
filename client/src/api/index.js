@@ -24,13 +24,14 @@ class Queries {
   getVacancies = async ({
     textSearch = '',
     areaId = 1,
-    countVacancies,
+    countItemsOnPage,
     currentPage = 1,
     experience = '',
+    salary,
   }) => {
-    const query = `text=${textSearch}&area=${areaId}&per_page=${countVacancies}&page=${
+    const query = `text=${textSearch}&area=${areaId}&per_page=${countItemsOnPage}&page=${
       currentPage - 1
-    }${experience}`;
+    }${experience}${salary}`;
 
     const res = await axios.get(`${this.base_url}/vacancies?${query}`);
     return res.data;
@@ -38,6 +39,17 @@ class Queries {
   /* Получение одной вакансии с полной информ. */
   getVacancy = async ({ id }) => {
     const res = await axios.get(`${this.base_url}/vacancies/${id}`);
+    return res.data;
+  };
+
+  getTokenBackend = async () => {
+    const res = await axios({
+      method: 'get',
+      url: 'http://localhost:8080/auth-hh',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return res.data;
   };
 
@@ -51,6 +63,32 @@ class Queries {
       },
     });
     return res.data;
+  };
+
+  getUserResume = async ({ accessToken }) => {
+    const res = await axios({
+      method: 'get',
+      url: 'https://api.hh.ru/resumes/mine',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return res.data;
+  };
+
+  sendResume = async ({ accessToken, vacancyId, resumeId }) => {
+    const query = `vacancy_id=${vacancyId}&resume_id=${resumeId}`;
+
+    const res = await axios({
+      method: 'post',
+      url: `${this.base_url}/negotiations?${query}`,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return res;
   };
 }
 

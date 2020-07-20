@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { setIsOpenModalSearch } from '../../redux/actions/utils';
+import {
+  setIsOpenModalSearch,
+  setIsOpenModalResume,
+} from '../../redux/actions/utils';
 
 const Wrapper = styled.div`
   border-radius: 5px;
@@ -62,8 +65,11 @@ const ButtonResume = styled.button`
 `;
 
 export const Sidebar = () => {
-  const { snippetVacancies } = useSelector((state) => state.reducerJobs);
-  const { city, experience } = useSelector((state) => state.reducerUserInfo);
+  const { snippetVacancies } = useSelector((state) => state.reducerVacancies);
+  const { city, experience, salary } = useSelector(
+    (state) => state.reducerUserInfo
+  );
+  const { activeResume } = useSelector((state) => state.reducerAuth);
   const dispatch = useDispatch();
 
   const validateExperience = (experience) => {
@@ -102,17 +108,31 @@ export const Sidebar = () => {
             <ItemResponse>{city.title}</ItemResponse>
           </Item>
           <Item>
+            <ItemBase>Зарплата:</ItemBase>
+            <ItemResponse>
+              {salary === null || salary === '' ? 'Не важно' : salary + ' руб'}
+            </ItemResponse>
+          </Item>
+          <Item>
             <ItemBase>Опыт:</ItemBase>
             <ItemResponse>{validateExperience(experience)}</ItemResponse>
           </Item>
         </List>
       </Information>
-      <ButtonResume>Выбрать резюме</ButtonResume>
+      <ButtonResume
+        onClick={() =>
+          dispatch(setIsOpenModalResume({ isOpenModalResume: true }))
+        }
+      >
+        Выбрать резюме
+      </ButtonResume>
       <Information>
         <Title>Активное резюме:</Title>
         <List>
           <Item>
-            <ItemBase>Fronted react, js</ItemBase>
+            <ItemBase>
+              {activeResume ? activeResume.title : 'Не выбрано'}
+            </ItemBase>
           </Item>
         </List>
       </Information>

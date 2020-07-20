@@ -6,7 +6,7 @@ import {
   fetchFullVacanciesRequest,
   fetchFullVacanciesSuccess,
   fetchFullVacanciesFailure,
-} from '../actions/jobs';
+} from '../actions/vacancies';
 
 const initState = {
   fullVacancies: [
@@ -21,7 +21,7 @@ const initState = {
   isLoadingData: false,
 };
 
-export const reducerJobs = handleActions(
+export const reducerVacancies = handleActions(
   {
     /* SNIPPETS VACANCIES */
 

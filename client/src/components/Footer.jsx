@@ -23,7 +23,7 @@ const PaginationApp = styled(Pagination)`
 
 export const Footer = () => {
   const dispatch = useDispatch();
-  const { snippetVacancies } = useSelector((state) => state.reducerJobs);
+  const { snippetVacancies } = useSelector((state) => state.reducerVacancies);
   const { countItemsOnPage, currentPage } = useSelector(
     (state) => state.reducerUtils
   );

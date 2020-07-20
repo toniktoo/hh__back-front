@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { Sidebar } from './sidebar/Sidebar';
 import { List } from './vacancies/List';
 import { ModalSearch } from './search/ModalSearch';
+import { ModalResume } from './sidebar/ModalResume';
 import { DataIsLoaded } from './Loader';
 
 const Wrapper = styled.div`
@@ -15,7 +16,7 @@ const Wrapper = styled.div`
 `;
 
 export const Content = () => {
-  const { isLoadingData } = useSelector((state) => state.reducerJobs);
+  const { isLoadingData } = useSelector((state) => state.reducerVacancies);
   return (
     <Wrapper>
       <Sidebar />
@@ -23,6 +24,7 @@ export const Content = () => {
         <List />
       </DataIsLoaded>
       <ModalSearch />
+      <ModalResume />
     </Wrapper>
   );
 };

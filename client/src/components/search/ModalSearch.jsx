@@ -2,20 +2,15 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  fetchSnippetVacanciesRequest,
-  fetchSnippetVacanciesSuccess,
-  fetchSnippetVacanciesFailure,
-  fetchFullVacanciesRequest,
-  fetchFullVacanciesSuccess,
-  fetchFullVacanciesFailure,
-} from '../../redux/actions/jobs';
+  fetchSnippetVacanciesApi,
+  fetchFullVacanciesApi,
+} from '../../redux/actions/vacancies';
 import {
   setIsOpenModalSearch,
   setFirstLoaded,
 } from '../../redux/actions/utils';
 
 import { Button, Modal } from 'antd';
-import queries from '../../api/index';
 import { ComponentSearch } from './ComponentSearch';
 import { ComponentExperience } from './ComponentExperience';
 import { ComponentCity } from './ComponentCity';
@@ -33,77 +28,34 @@ export const ModalSearch = () => {
   const [textValue, setTextValue] = useState('');
   const dispatch = useDispatch();
 
-  const { snippetVacancies } = useSelector((state) => state.reducerJobs);
+  const { snippetVacancies } = useSelector((state) => state.reducerVacancies);
   const {
     countItemsOnPage,
     currentPage,
     isOpenModalSearch,
     firstLoadedApp,
   } = useSelector((state) => state.reducerUtils);
-  const { city, experience } = useSelector((state) => state.reducerUserInfo);
+  const { city, experience, salary } = useSelector(
+    (state) => state.reducerUserInfo
+  );
   const { accessToken } = useSelector((state) => state.reducerAuth);
 
-  const fetchFullVacancies = async () => {
-    dispatch(fetchFullVacanciesRequest({ isLoadingData: true }));
-    try {
-      let arrayIds = [];
-      /* Получаем все id вакансий из краткого описания вакансий (snippetVacancies) */
-      await snippetVacancies.items.forEach((item) => arrayIds.push(item.id));
+  const fetchSnippetVacancies = () =>
+    dispatch(
+      fetchSnippetVacanciesApi({
+        textSearch: textValue,
+        areaId: city.areaId,
+        countItemsOnPage,
+        currentPage,
+        experience,
+        salary,
+      })
+    );
 
-      const fullVacancies = [];
-      /* Отправляем запрос по каждой id чтобы получить описане полной вакансии */
-      await arrayIds.forEach(async (id, index) => {
-        const vacancy = await queries.getVacancy({ id });
-        await fullVacancies.push(vacancy);
-        await arrayIds.shift();
-        if (0 === arrayIds.length) {
-          dispatch(
-            fetchFullVacanciesSuccess({ fullVacancies, isLoadingData: false })
-          );
-        }
-      });
-    } catch (err) {
-      dispatch(fetchFullVacanciesFailure({ isLoadingData: false }));
-    }
-  };
+  const fetchFullVacancies = () =>
+    dispatch(fetchFullVacanciesApi({ snippetVacancies }));
 
-  /* Опыт работы */
-
-  const validateExperience = (experience) => {
-    switch (experience) {
-      case 1:
-        return '';
-      case 2:
-        return '&experience=noExperience';
-      case 3:
-        return '&experience=between1And3';
-      case 4:
-        return '&experience=between3And6';
-      default:
-        return '';
-    }
-  };
-
-  const fetchSnippetVacancies = async (textSearch, areaId) => {
-    dispatch(fetchSnippetVacanciesRequest({ isLoadingData: true }));
-    try {
-      /* Получаем краткое описание вакансий */
-      const snippetVacancies = await queries.getVacancies({
-        textSearch,
-        areaId,
-        countVacancies: countItemsOnPage,
-        currentPage: currentPage,
-        experience: validateExperience(experience),
-      });
-      dispatch(
-        fetchSnippetVacanciesSuccess({ snippetVacancies, isLoadingData: false })
-      );
-    } catch (err) {
-      dispatch(fetchSnippetVacanciesFailure({ isLoadingData: false }));
-    }
-  };
-
-  /* Когда получаем краткое описане вакансии, сразу делаем запрос за полным описанием */
+  /* Когда получаем краткое описане вакансий, сразу делаем запрос за полным описанием каждой вакансии */
   useEffect(() => {
     snippetVacancies.length !== 0 && fetchFullVacancies();
   }, [snippetVacancies]);
@@ -111,13 +63,13 @@ export const ModalSearch = () => {
   /* Если переходим на другую страницу */
   useEffect(() => {
     if (firstLoadedApp) {
-      fetchSnippetVacancies(textValue, city.areaId);
+      fetchSnippetVacancies();
     }
   }, [currentPage]);
 
   const handleSubmit = async () => {
     dispatch(setFirstLoaded({ firstLoadedApp: true }));
-    await fetchSnippetVacancies(textValue, city.areaId);
+    await fetchSnippetVacancies();
     await toggleSettings();
   };
 
@@ -149,10 +101,10 @@ export const ModalSearch = () => {
           <ComponentCity />
         </Item>
         <Item>
-          <ComponentExperience />
+          <ComponentSalary />
         </Item>
         <Item>
-          <ComponentSalary />
+          <ComponentExperience />
         </Item>
       </Modal>
     </>

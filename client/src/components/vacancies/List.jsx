@@ -3,8 +3,10 @@ import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import ReactHover from 'react-hover';
 import { setCountItemsOnPage } from '../../redux/actions/utils';
+
 import { Modal } from './Modal';
-import { Button } from 'antd';
+import { Vacancy } from './vacancy/Vacancy';
+import { AlertCustom } from '../AlertCustom';
 
 const Wrapper = styled.div`
   max-width: calc(100vw - 298px);
@@ -28,53 +30,6 @@ const ListWparrer = styled.ul`
   margin: 0 0 10px 0;
 `;
 
-const Item = styled.div`
-  display: flex;
-  align-items: column;
-  justify-content: space-between;
-  align-items: flex-start;
-`;
-
-const ItemMain = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-`;
-
-const ItemInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: space-between;
-  justify-content: center;
-  width: 260px;
-  @media (max-width: 1400px) {
-    width: 220px;
-  }
-`;
-
-const ItemSidebar = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const CompanyLink = styled.a`
-  color: #6193e8;
-  font-size: 14px;
-  font-weight: 500;
-  @media (max-width: 1400px) {
-    font-size: 12px;
-  }
-`;
-
-const SalaryText = styled.span`
-  color: #86888c;
-  font-size: 14px;
-  font-weight: 500;
-  @media (max-width: 1400px) {
-    font-size: 12px;
-  }
-`;
-
 const ItemWrapper = styled.li`
   width: 100%;
   height: 45px;
@@ -95,30 +50,6 @@ const ItemWrapper = styled.li`
     height: 40px;
   }
 `;
-const Title = styled.a`
-  margin: 6px 0 0 6px;
-  color: #000;
-  font-size: 20px;
-  font-weight: 500;
-  transition: 0.7s;
-
-  &:hover {
-    color: #1890ff;
-  }
-
-  @media (max-width: 1400px) {
-    font-size: 14px;
-    margin: 0 0 0 6px;
-  }
-`;
-
-const ButtonSendResume = styled(Button)`
-  display: none;
-  margin: 6px 0 0 6px;
-  @media (max-width: 1400px) {
-    margin: 0;
-  }
-`;
 
 export const List = () => {
   const refList = useRef();
@@ -126,38 +57,10 @@ export const List = () => {
   const [itemHeight, setItemHeight] = useState(40);
   const dispatch = useDispatch();
 
-  const { fullVacancies } = useSelector((state) => state.reducerJobs);
-  const { countItemsOnPage } = useSelector((state) => state.reducerUtils);
-
-  const handleEmptyData = (data, arg) => (data && data[arg]) || null;
-
-  const renderSalary = (salary) => {
-    let res = '';
-    const salaryFrom = handleEmptyData(salary, 'from');
-    const salaryTo = handleEmptyData(salary, 'to');
-    const salaryCurrency = handleEmptyData(salary, 'currency');
-    if (salaryFrom) {
-      res += `от ${salaryFrom} `;
-    }
-    if (salaryTo) {
-      res += `до ${salaryTo} `;
-    }
-    if (salaryCurrency) {
-      res += `${salaryCurrency}`;
-    }
-    return res === '' ? 'Не указана' : res;
-  };
-
-  const renderCompany = (item) => {
-    let company = null;
-    company = handleEmptyData(item, 'name');
-    if (company === null) {
-      return 'Не указана';
-    }
-    return company && company.length > 19
-      ? company.slice(0, 19) + '...'
-      : company;
-  };
+  const { fullVacancies } = useSelector((state) => state.reducerVacancies);
+  const { countItemsOnPage, isOpenAlertResume } = useSelector(
+    (state) => state.reducerUtils
+  );
 
   const optionsModalHover = (index) => {
     return {
@@ -167,47 +70,13 @@ export const List = () => {
     };
   };
 
-  const handleSendResume = () => {
-    console.log(1);
-  };
-
   const renderList = () =>
     fullVacancies.map((item, index) => {
       return (
         <ItemWrapper key={item.id} ref={refItem}>
           <ReactHover options={optionsModalHover(index)}>
             <ReactHover.Trigger type="trigger">
-              <Item>
-                <ItemMain>
-                  <ButtonSendResume
-                    className="btn__send_resume"
-                    onClick={handleSendResume}
-                  >
-                    Отправить резюме
-                  </ButtonSendResume>
-                  <Title
-                    href={`https://spb.hh.ru/vacancy/${item.id}`}
-                    target="_blank"
-                  >
-                    {item.name.length > 44
-                      ? item.name.slice(0, 44) + '...'
-                      : item.name}
-                  </Title>
-                </ItemMain>
-                <ItemSidebar>
-                  <ItemInfo>
-                    <SalaryText>
-                      Зарплата: {renderSalary(item.salary)}
-                    </SalaryText>
-                    <CompanyLink
-                      href={handleEmptyData(item.employer, 'alternate_url')}
-                      target="_blank"
-                    >
-                      Компания: {renderCompany(item.employer)}
-                    </CompanyLink>
-                  </ItemInfo>
-                </ItemSidebar>
-              </Item>
+              <Vacancy item={item} />
             </ReactHover.Trigger>
             <ReactHover.Hover type="hover">
               <Modal item={item} />
@@ -235,6 +104,10 @@ export const List = () => {
   return (
     <Wrapper>
       <ListWparrer ref={refList}>{renderList()}</ListWparrer>
+      <AlertCustom
+        isShow={isOpenAlertResume}
+        text="Резюме успешно отправлено!"
+      />
     </Wrapper>
   );
 };
