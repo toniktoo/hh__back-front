@@ -37,6 +37,7 @@ const validateSalary = (salary) => {
 };
 
 export const fetchSnippetVacanciesApi = ({
+  accessToken,
   textSearch,
   areaId,
   countItemsOnPage,
@@ -48,6 +49,7 @@ export const fetchSnippetVacanciesApi = ({
   try {
     /* Получаем краткое описание вакансий */
     const snippetVacancies = await queries.getVacancies({
+      accessToken,
       textSearch,
       areaId,
       countItemsOnPage,
@@ -73,9 +75,10 @@ export const fetchFullVacanciesFailure = createAction(
   'FETCH_FULL_VACANCIES_FAILURE'
 );
 
-export const fetchFullVacanciesApi = ({ snippetVacancies }) => async (
-  dispatch
-) => {
+export const fetchFullVacanciesApi = ({
+  snippetVacancies,
+  accessToken,
+}) => async (dispatch) => {
   dispatch(fetchFullVacanciesRequest({ isLoadingData: true }));
   try {
     let arrayIds = [];
@@ -85,12 +88,16 @@ export const fetchFullVacanciesApi = ({ snippetVacancies }) => async (
     const fullVacancies = [];
     /* Отправляем запрос по каждой id чтобы получить описане полной вакансии */
     await arrayIds.forEach(async (id, index) => {
-      const vacancy = await queries.getVacancy({ id });
+      const vacancy = await queries.getVacancy({ id,accessToken });
       await fullVacancies.push(vacancy);
       await arrayIds.shift();
       if (0 === arrayIds.length) {
         dispatch(
-          fetchFullVacanciesSuccess({ fullVacancies, isLoadingData: false })
+          fetchFullVacanciesSuccess({
+            fullVacancies,
+            isLoadingData: false,
+            accessToken,
+          })
         );
       }
     });

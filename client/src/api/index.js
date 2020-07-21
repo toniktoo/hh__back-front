@@ -32,13 +32,19 @@ class Queries {
     const query = `text=${textSearch}&area=${areaId}&per_page=${countItemsOnPage}&page=${
       currentPage - 1
     }${experience}${salary}`;
-
     const res = await axios.get(`${this.base_url}/vacancies?${query}`);
     return res.data;
   };
   /* Получение одной вакансии с полной информ. */
-  getVacancy = async ({ id }) => {
-    const res = await axios.get(`${this.base_url}/vacancies/${id}`);
+  getVacancy = async ({ id, accessToken }) => {
+    const res = await axios({
+      method: 'get',
+      url: `${this.base_url}/vacancies/${id}`,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     return res.data;
   };
 

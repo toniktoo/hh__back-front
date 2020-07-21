@@ -136,6 +136,14 @@ export const Sidebar = () => {
           </Item>
         </List>
       </Information>
+      <Information>
+        <Title>Дополнительно:</Title>
+        <List>
+          <Item>
+            <ItemBase>Новые вакансии за неделю</ItemBase>
+          </Item>
+        </List>
+      </Information>
     </Wrapper>
   );
 };

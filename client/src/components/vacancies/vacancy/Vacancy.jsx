@@ -54,7 +54,7 @@ const SalaryText = styled.span`
 
 const Title = styled.a`
   margin: 6px 0 0 6px;
-  color: #000;
+  color: ${({ myColor }) => myColor};
   font-size: 20px;
   font-weight: 500;
   transition: 0.7s;
@@ -123,17 +123,35 @@ export const Vacancy = ({ item }) => {
       : company;
   };
 
+  const renderRelations = (relations) => {
+    if (relations === 'got_invitation')
+      return { name: ' - Пригласили', color: '#21c10e' };
+    if (relations === 'got_response')
+      return { name: ' - Откликались', color: '#115fd4' };
+    if (relations === 'got_rejection')
+      return { name: ' - Отказ', color: 'red' };
+    return { name: '', color: '#000' };
+  };
+
+  const relations = item.relations;
+
   return (
     <Item>
       <ItemMain>
         <ButtonSendResume
           className="btn__send_resume"
           onClick={handleSendResume}
+          disabled={!!(relations && relations[0])}
         >
           Отправить резюме
         </ButtonSendResume>
-        <Title href={`https://spb.hh.ru/vacancy/${item.id}`} target="_blank">
+        <Title
+          myColor={relations && renderRelations(relations[0]).color}
+          href={`https://spb.hh.ru/vacancy/${item.id}`}
+          target="_blank"
+        >
           {item.name.length > 44 ? item.name.slice(0, 44) + '...' : item.name}
+          {relations && renderRelations(relations[0]).name}
         </Title>
       </ItemMain>
       <ItemSidebar>

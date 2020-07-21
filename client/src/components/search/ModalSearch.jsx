@@ -53,7 +53,7 @@ export const ModalSearch = () => {
     );
 
   const fetchFullVacancies = () =>
-    dispatch(fetchFullVacanciesApi({ snippetVacancies }));
+    dispatch(fetchFullVacanciesApi({ snippetVacancies, accessToken }));
 
   /* Когда получаем краткое описане вакансий, сразу делаем запрос за полным описанием каждой вакансии */
   useEffect(() => {
