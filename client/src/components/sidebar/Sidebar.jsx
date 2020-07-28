@@ -33,6 +33,9 @@ const Information = styled.div`
   padding: 8px;
 `;
 const Title = styled.h3``;
+const SubTitle = styled.h5`
+  color: red;
+`;
 const List = styled.ul`
   margin: 0;
 `;
@@ -98,6 +101,7 @@ export const Sidebar = () => {
       </ButtonSearch>
       <Information>
         <Title>Информация поиска:</Title>
+
         <List>
           <Item>
             <ItemBase>Найдено вакансий:</ItemBase>
@@ -133,12 +137,18 @@ export const Sidebar = () => {
             <ItemBase>
               {activeResume ? activeResume.title : 'Не выбрано'}
             </ItemBase>
+            <SubTitle>
+              {activeResume ? 'будет отправляться на вакансии' : null}
+            </SubTitle>
           </Item>
         </List>
       </Information>
       <Information>
         <Title>Дополнительно:</Title>
         <List>
+          <Item>
+            <ItemBase>Этот раздел в разработке</ItemBase>
+          </Item>
           <Item>
             <ItemBase>Новые вакансии за неделю</ItemBase>
           </Item>

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const uniq = require('lodash/uniq');
 
 const config = require('./config');
 
@@ -37,6 +38,18 @@ app.get('/auth-hh', (req, res) => {
   const { accessToken } = db;
   if (accessToken) {
     res.status(200).json({ accessToken });
+    return;
+  }
+  res.status(400).send('Вы не авторизированы');
+});
+
+app.get('/disconnect', (req, res) => {
+  const { accessToken } = db;
+  if (accessToken) {
+    db = {
+      accessToken: null,
+    };
+    res.status(200);
     return;
   }
   res.status(400).send('Вы не авторизированы');

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
+import queries from './api/index';
 
 import {
   checkAuthUserApi,
@@ -31,6 +32,8 @@ const App = () => {
       dispatch(fetchUserInfoApi({ accessToken }));
       dispatch(fetchUserResumeApi({ accessToken }));
     }
+
+    return () => queries.disconnect();
   }, [accessToken]);
 
   return (

@@ -1,5 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { setUserActiveResume } from '../../redux/actions/auth';
 import { Avatar, Checkbox } from 'antd';
 
 const Wrapper = styled.div``;
@@ -11,7 +14,12 @@ const Item = styled.li`
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  margin-top: 16px;
+  padding: 8px;
+  background-color: ${({ isActive }) => (isActive ? '#f9fafb' : null)};
+
+  &:hover {
+    background-color: #e4e6ef;
+  }
 `;
 
 const Info = styled.div`
@@ -25,16 +33,27 @@ const Title = styled.h2`
 `;
 
 export const ListResume = ({ resume }) => {
+  const { activeResume } = useSelector((state) => state.reducerAuth);
+  const dispatch = useDispatch();
+
+  const handleChangeActiveResume = (currentResume) => {
+    dispatch(setUserActiveResume({ activeResume: currentResume }));
+  };
+
   return (
     <Wrapper>
       <List>
         {resume.map((item) => (
-          <Item key={item.id}>
+          <Item
+            key={item.id}
+            isActive={activeResume.id === item.id}
+            onClick={() => handleChangeActiveResume(item)}
+          >
             <Info>
               <Avatar shape="circle" src={item.photo['100']} size="large" />
               <Title>{item.title}</Title>
             </Info>
-            <Checkbox />
+            <Checkbox checked={activeResume.id === item.id} />
           </Item>
         ))}
       </List>

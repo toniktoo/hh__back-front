@@ -96,6 +96,16 @@ class Queries {
     });
     return res;
   };
+
+  disconnect = async () => {
+    await axios({
+      method: 'get',
+      url: 'http://localhost:8080/disconnect',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  };
 }
 
 export default new Queries();
