@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { sendUserResumeApi } from '../../../redux/actions/vacancies';
 
-import { Button, Alert } from 'antd';
+import { Button } from 'antd';
 
 const Item = styled.div`
   display: flex;
@@ -13,7 +13,7 @@ const Item = styled.div`
 `;
 
 const ItemMain = styled.div`
-  display: flex;
+  display: flex;  
   align-items: center;
   justify-content: flex-start;
 `;

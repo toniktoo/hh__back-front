@@ -14,6 +14,6 @@ code {
 
 /* В модалке вакансии убираем отступы( приходит html с сервера) */
 .deYMyb * {
-  font-size: 14px;
+  font-size: 10px;
   margin: 0;
 }

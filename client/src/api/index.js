@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { message } from 'antd';
 
+// TODO НУЖНО ДОБАВИТЬ ИНТЕРЦЕПТОРС ДЛЯ ОТПРВКИ accessToken
+
 class Queries {
   constructor() {
-    this.base_url = 'https://api.hh.ru';
+    this.url_api_hh = 'https://api.hh.ru';
+    this.url_backend = 'http://localhost:8080';
     axios.interceptors.response.use(this.handleSuccess, this.handleError);
   }
 
@@ -32,26 +35,37 @@ class Queries {
     const query = `text=${textSearch}&area=${areaId}&per_page=${countItemsOnPage}&page=${
       currentPage - 1
     }${experience}${salary}`;
-    const res = await axios.get(`${this.base_url}/vacancies?${query}`);
+    const res = await axios.get(`${this.url_api_hh}/vacancies?${query}`);
     return res.data;
   };
-  /* Получение одной вакансии с полной информ. */
-  getVacancy = async ({ id, accessToken }) => {
+  getTokenBackend = async () => {
     const res = await axios({
       method: 'get',
-      url: `${this.base_url}/vacancies/${id}`,
+      url: `${this.url_backend}/auth-hh`,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     return res.data;
   };
+  /* Получение одной вакансии с полной информ. */
+  getVacancy = async ({ id, accessToken }) => {
+    let res;
 
-  getTokenBackend = async () => {
-    const res = await axios({
+    if (accessToken !== null) {
+      res = await axios({
+        method: 'get',
+        url: `${this.url_api_hh}/vacancies/${id}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return res.data;
+    }
+    res = await axios({
       method: 'get',
-      url: 'http://localhost:8080/auth-hh',
+      url: `${this.url_api_hh}/vacancies/${id}`,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -60,24 +74,48 @@ class Queries {
   };
 
   getUserInfo = async ({ accessToken }) => {
-    const res = await axios({
+    let res;
+    if (accessToken !== null) {
+      res = await axios({
+        method: 'get',
+        url: `${this.url_api_hh}/me`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return res.data;
+    }
+    res = await axios({
       method: 'get',
-      url: 'https://api.hh.ru/me',
+      url: `${this.url_api_hh}/me`,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     return res.data;
   };
 
   getUserResume = async ({ accessToken }) => {
-    const res = await axios({
+    let res;
+
+    if (accessToken !== null) {
+      res = await axios({
+        method: 'get',
+        url: `${this.url_api_hh}/resumes/mine`,
+
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return res.data;
+    }
+    res = await axios({
       method: 'get',
-      url: 'https://api.hh.ru/resumes/mine',
+      url: `${this.url_api_hh}/resumes/mine`,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     return res.data;
@@ -85,13 +123,25 @@ class Queries {
 
   sendResume = async ({ accessToken, vacancyId, resumeId }) => {
     const query = `vacancy_id=${vacancyId}&resume_id=${resumeId}`;
+    let res;
 
-    const res = await axios({
+    if (accessToken !== null) {
+      res = await axios({
+        method: 'post',
+        url: `${this.url_api_hh}/negotiations?${query}`,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return res.data;
+    }
+
+    res = await axios({
       method: 'post',
-      url: `${this.base_url}/negotiations?${query}`,
+      url: `${this.url_api_hh}/negotiations?${query}`,
       headers: {
         'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${accessToken}`,
       },
     });
     return res;
@@ -100,7 +150,7 @@ class Queries {
   disconnect = async () => {
     await axios({
       method: 'get',
-      url: 'http://localhost:8080/disconnect',
+      url: `${this.url_backend}/disconnect`,
       headers: {
         'Content-Type': 'application/json',
       },

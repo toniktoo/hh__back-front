@@ -1,20 +1,25 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const uniq = require('lodash/uniq');
+// const uniq = require('lodash/uniq');
+
+//  TODO ДОБАВИТЬ НОВОГО ПОЛЬЗОВАТЕЛЯ СОХРАНЯТЬ ПОД СВОИ ID в db
 
 const config = require('./config');
+const port = process.env.PORT || 8080;
 
 const { clientID, clientSecret } = config;
 
-const redirect_uri = 'http://localhost:8080/headhunter';
-
 const app = express();
+const index = require('./routes/index');
+
+app.use(cors());
+app.use(index);
+
 let db = {
   accessToken: null,
 };
-
-app.use(cors());
+// const db2 = [{ idClient: null, accessToken: null }];
 
 app.get('/headhunter', (req, res) => {
   const requestToken = req.query.code;
@@ -55,6 +60,6 @@ app.get('/disconnect', (req, res) => {
   res.status(400).send('Вы не авторизированы');
 });
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!');
+app.listen(port, function () {
+  console.log('Example app listening on port ' + port);
 });

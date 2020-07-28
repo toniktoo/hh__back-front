@@ -13,10 +13,6 @@ export const checkAuthUserApi = () => async (dispatch) => {
     const resTokenBackend = await queries.getTokenBackend();
     if (resTokenBackend) {
       dispatch(setAccessToken({ accessToken: resTokenBackend.accessToken }));
-      localStorage.setItem(
-        'currentUser',
-        JSON.stringify({ accessToken: resTokenBackend.accessToken })
-      );
     }
   } catch (err) {
     console.log(err);
